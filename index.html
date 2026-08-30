@@ -344,16 +344,8 @@
   document.getElementById('exportBtn').addEventListener('click', () => {
     const leads = getLeads();
     if (!leads.length) { alert('אין עדיין פניות לייצוא'); return; }
-    const headers = ['תאריך שמירה','שם','טלפון','עיר המרפאה','מאשר קבלת מידע שיווקי ולימודי','DO NOT SEND','אימייל'];
-    const rows = leads.map(l => [
-      l.savedAt,
-      l.name,
-      l.phone,
-      l.city,
-      l.mailing === 'כן' ? '+' : '',
-      l.mailing === 'כן' ? '' : '+',
-      l.email
-    ]);
+    const headers = ['תאריך שמירה','שם','טלפון','עיר המרפאה','הצטרפות לדיוור','אימייל'];
+    const rows = leads.map(l => [l.savedAt, l.name, l.phone, l.city, l.mailing, l.email]);
     const csv = '\ufeff' + [headers, ...rows].map(row => row.map(csvEscape).join(',')).join('\n');
     const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);
