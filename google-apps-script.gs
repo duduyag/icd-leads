@@ -23,7 +23,7 @@ function doPost(e) {
     if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
 
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['תאריך שמירה', 'שם', 'טלפון', 'עיר המרפאה', 'הצטרפות לדיוור', 'אימייל', 'זמן קליטה בשרת']);
+      sheet.appendRow(['תאריך שמירה', 'שם', 'טלפון', 'עיר המרפאה', 'הצטרפות לדיוור', 'אימייל', 'זמן קליטה בשרת', 'ימי פעילות של המרפאה']);
     }
 
     const p = e.parameter || {};
@@ -34,7 +34,8 @@ function doPost(e) {
       p.city || '',
       p.mailing || '',
       p.email || '',
-      new Date()
+      new Date(),
+      p.activityDays || ''
     ]);
 
     return ContentService
