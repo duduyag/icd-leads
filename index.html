@@ -286,8 +286,8 @@
             </div>
           </fieldset>
           <label class="check-row" for="mailing">
-            <input id="mailing" name="mailing" type="checkbox" />
-            <span>אני מאשר קבלת מידע שיווקי ולימודי</span>
+            <input id="mailing" name="mailing" type="checkbox" checked />
+            <span>הודעה בלבד</span>
           </label>
           <div id="emailBlock">
             <label for="email">כתובת דואר אלקטרוני <span class="optional">לא חובה</span></label>
@@ -337,9 +337,14 @@
     const end = fullName.value.length;
     if (typeof fullName.setSelectionRange === 'function') fullName.setSelectionRange(end, end);
   }
+  function syncEmailBlock(){
+    emailBlock.classList.toggle('show', mailing.checked);
+    if (!mailing.checked) document.getElementById('email').value = '';
+  }
   function resetForm(){
     form.reset();
-    emailBlock.classList.remove('show');
+    mailing.checked = true;
+    syncEmailBlock();
     error.textContent = '';
     fullName.focus();
     placeCursorAfterPrefix();
@@ -366,10 +371,7 @@
     }).catch(() => savePending(lead));
   }
 
-  mailing.addEventListener('change', () => {
-    emailBlock.classList.toggle('show', mailing.checked);
-    if (!mailing.checked) document.getElementById('email').value = '';
-  });
+  mailing.addEventListener('change', syncEmailBlock);
 
   fullName.addEventListener('focus', placeCursorAfterPrefix);
 
@@ -424,6 +426,7 @@
   });
 
   updateCount();
+  syncEmailBlock();
   placeCursorAfterPrefix();
 })();
 </script>
