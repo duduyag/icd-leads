@@ -125,7 +125,7 @@
     form { display: grid; gap: 18px; }
     label { display: block; font-weight: 800; font-size: 18px; margin-bottom: 8px; }
     .optional { color: var(--muted); font-size: 15px; font-weight: 600; }
-    input[type="text"], input[type="tel"], input[type="email"] {
+    input[type="text"], input[type="tel"], input[type="email"], textarea {
       width: 100%;
       border: 2px solid var(--line);
       background: white;
@@ -136,7 +136,13 @@
       outline: none;
       transition: border .18s, box-shadow .18s;
     }
-    input:focus { border-color: var(--gold); box-shadow: 0 0 0 5px rgba(215,164,65,.16); }
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      line-height: 1.35;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 5px rgba(215,164,65,.16); }
     fieldset { border: 0; margin: 0; padding: 0; }
     legend { display: block; font-weight: 800; font-size: 18px; margin-bottom: 8px; padding: 0; }
     .days-grid {
@@ -223,7 +229,8 @@
       .hero { padding: 28px; gap: 20px; }
       .logo-wrap { width: min(300px, 100%); padding: 16px; }
       .form-side { padding: 28px; }
-      input[type="text"], input[type="tel"], input[type="email"] { font-size: 22px; min-height: 66px; }
+      input[type="text"], input[type="tel"], input[type="email"], textarea { font-size: 22px; min-height: 66px; }
+      textarea { min-height: 118px; }
     }
   </style>
 </head>
@@ -254,6 +261,10 @@
           <div>
             <label for="fullName">שם מלא</label>
             <input id="fullName" name="fullName" type="text" inputmode="text" required autofocus />
+          </div>
+          <div>
+            <label for="notes">הערות <span class="optional">לא חובה</span></label>
+            <textarea id="notes" name="notes" inputmode="text"></textarea>
           </div>
           <div>
             <label for="phone">טלפון</label>
@@ -358,6 +369,7 @@
     const lead = {
       savedAt: new Date().toISOString(),
       name: clean(document.getElementById('fullName').value),
+      notes: clean(document.getElementById('notes').value),
       phone: clean(document.getElementById('phone').value),
       city: clean(document.getElementById('city').value),
       activityDays: Array.from(document.querySelectorAll('input[name="activityDays"]:checked')).map(input => input.value).join(', '),
@@ -377,8 +389,8 @@
   document.getElementById('exportBtn').addEventListener('click', () => {
     const leads = getLeads();
     if (!leads.length) { alert('אין עדיין פניות לייצוא'); return; }
-    const headers = ['תאריך שמירה','שם','טלפון','עיר המרפאה','ימי פעילות של המרפאה','הצטרפות לדיוור','אימייל'];
-    const rows = leads.map(l => [l.savedAt, l.name, l.phone, l.city, l.activityDays, l.mailing, l.email]);
+    const headers = ['תאריך שמירה','שם','הערות','טלפון','עיר המרפאה','ימי פעילות של המרפאה','הצטרפות לדיוור','אימייל'];
+    const rows = leads.map(l => [l.savedAt, l.name, l.notes, l.phone, l.city, l.activityDays, l.mailing, l.email]);
     const csv = '\ufeff' + [headers, ...rows].map(row => row.map(csvEscape).join(',')).join('\n');
     const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);

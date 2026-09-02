@@ -36,6 +36,7 @@ function getSheet_() {
     sheet.appendRow([
       'תאריך שמירה',
       'שם',
+      'הערות',
       'טלפון',
       'עיר המרפאה',
       'הצטרפות לדיוור',
@@ -43,6 +44,12 @@ function getSheet_() {
       'זמן קליטה בשרת',
       'ימי פעילות של המרפאה'
     ]);
+  } else {
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    if (headers.indexOf('הערות') === -1) {
+      sheet.insertColumnAfter(2);
+      sheet.getRange(1, 3).setValue('הערות');
+    }
   }
 
   return sheet;
@@ -72,6 +79,7 @@ function doPost(e) {
     sheet.appendRow([
       p.savedAt || '',
       normalizeDoctorName_(p.name),
+      p.notes || '',
       p.phone || '',
       p.city || '',
       p.mailing || '',
