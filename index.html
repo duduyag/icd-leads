@@ -260,7 +260,7 @@
         <form id="leadForm" autocomplete="off" novalidate>
           <div>
             <label for="fullName">שם מלא</label>
-            <input id="fullName" name="fullName" type="text" inputmode="text" placeholder="ד״ר" required autofocus />
+            <input id="fullName" name="fullName" type="text" inputmode="text" value="ד״ר " required autofocus />
           </div>
           <div>
             <label for="notes">הערות <span class="optional">לא חובה</span></label>
@@ -316,11 +316,13 @@
   const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzSmbOgslD3wedQrkAQFSgDQdHdOEhDXzJT7WW4tHrqYDMTtyoD7V2tTQI4Hu0_5TVY/exec';
   const KEY = 'icd_israel_leads_pending_v1';
   const form = document.getElementById('leadForm');
+  const fullName = document.getElementById('fullName');
   const mailing = document.getElementById('mailing');
   const emailBlock = document.getElementById('emailBlock');
   const error = document.getElementById('error');
   const thanks = document.getElementById('thanks');
   const countText = document.getElementById('countText');
+  const DOCTOR_PREFIX = 'ד״ר ';
 
   function getLeads(){
     try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
@@ -330,11 +332,17 @@
   function updateCount(){ countText.textContent = 'נשמרו ' + getLeads().length + ' פניות במכשיר זה'; }
   function clean(v){ return String(v || '').trim(); }
   function csvEscape(v){ return '"' + String(v ?? '').replaceAll('"','""') + '"'; }
+  function placeCursorAfterPrefix(){
+    if (!fullName.value.trim()) fullName.value = DOCTOR_PREFIX;
+    const end = fullName.value.length;
+    if (typeof fullName.setSelectionRange === 'function') fullName.setSelectionRange(end, end);
+  }
   function resetForm(){
     form.reset();
     emailBlock.classList.remove('show');
     error.textContent = '';
-    document.getElementById('fullName').focus();
+    fullName.focus();
+    placeCursorAfterPrefix();
   }
 
   function savePending(lead){
@@ -363,12 +371,14 @@
     if (!mailing.checked) document.getElementById('email').value = '';
   });
 
+  fullName.addEventListener('focus', placeCursorAfterPrefix);
+
   form.addEventListener('submit', (ev) => {
     ev.preventDefault();
     error.textContent = '';
     const lead = {
       savedAt: new Date().toISOString(),
-      name: clean(document.getElementById('fullName').value),
+      name: clean(fullName.value),
       notes: clean(document.getElementById('notes').value),
       phone: clean(document.getElementById('phone').value),
       city: clean(document.getElementById('city').value),
@@ -376,7 +386,7 @@
       mailing: mailing.checked ? 'כן' : 'לא',
       email: mailing.checked ? clean(document.getElementById('email').value) : ''
     };
-    if (!lead.name) { error.textContent = 'נא למלא שם מלא'; return; }
+    if (!lead.name || /^ד["'׳״]?ר\.?$/.test(lead.name)) { error.textContent = 'נא למלא שם מלא'; return; }
     if (!lead.phone) { error.textContent = 'נא למלא מספר טלפון'; return; }
     sendToGoogleSheets(lead);
     thanks.classList.add('show');
@@ -414,6 +424,7 @@
   });
 
   updateCount();
+  placeCursorAfterPrefix();
 })();
 </script>
 </body>
